@@ -1,7 +1,10 @@
 package com.avantica.videochat.rtc;
 
 import android.content.Context;
+import android.media.projection.MediaProjection;
 import android.util.Log;
+
+import com.avantica.videochat.App;
 
 import androidx.annotation.Nullable;
 
@@ -10,14 +13,17 @@ import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraEnumerator;
 import org.webrtc.DataChannel;
+import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RtpReceiver;
+import org.webrtc.ScreenCapturerAndroid;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
+import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
@@ -75,14 +81,16 @@ public class RTCClient implements PeerConnection.Observer {
     }
 
     private void initPeerConnectionFactory(Context context) {
+
         PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
                 .builder(context)
-                .setEnableVideoHwAcceleration(true)
+               // .setEnableVideoHwAcceleration(true)
                 .createInitializationOptions());
 
         connectionFactory = PeerConnectionFactory
                 .builder()
                 .createPeerConnectionFactory();
+
     }
 
     private void initPeerConnection() {
@@ -161,16 +169,20 @@ public class RTCClient implements PeerConnection.Observer {
 
     //region Private helpers
     // Generate local stream and keep it live and add to new peer connection
+
     private MediaStream generateLocalStream() {
 
         MediaStream localStream = connectionFactory.createLocalMediaStream("RTCmS");
 
 
         VideoCapturer videoCapturer = createVideoCapturer();
-        VideoSource videoSource = connectionFactory.createVideoSource(videoCapturer);
+        VideoSource videoSource = connectionFactory.createVideoSource(false);
         VideoTrack videoTrack = connectionFactory.createVideoTrack("RTCvS0", videoSource);
         videoTrack.setEnabled(true);
         localStream.addTrack(videoTrack);
+        EglBase.Context eglBaseContext = EglBase.create().getEglBaseContext();
+        SurfaceTextureHelper surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglBaseContext);
+        videoCapturer.initialize(surfaceTextureHelper,App.getContext(),videoSource.getCapturerObserver());
         videoCapturer.startCapture(1024, 640, 24);
 
 
@@ -180,6 +192,61 @@ public class RTCClient implements PeerConnection.Observer {
         localStream.addTrack(audioTrack);
 
         return localStream;
+    }
+
+    /*private MediaStream generateLocalStream() {
+
+        MediaStream localStream = connectionFactory.createLocalMediaStream("RTCmS");
+
+
+        VideoCapturer videoCapturer = createVideoCapturer();
+        //VideoSource videoSource = connectionFactory.createVideoSource(videoCapturer);
+
+        if (videoCapturer != null) {
+            EglBase.Context eglBaseContext = EglBase.create().getEglBaseContext();
+            SurfaceTextureHelper surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglBaseContext);
+            VideoSource videoSource = connectionFactory.createVideoSource(videoCapturer.isScreencast());
+            videoCapturer.initialize(surfaceTextureHelper, App.getContext(), videoSource.getCapturerObserver());
+            VideoTrack videoTrack = connectionFactory.createVideoTrack("RTCvS0", videoSource);
+            videoTrack.setEnabled(true);
+            localStream.addTrack(videoTrack);
+        }
+
+        //VideoSource videoSource = connectionFactory.createVideoSource(false);
+//        VideoTrack videoTrack = connectionFactory.createVideoTrack("RTCvS0", videoSource);
+//        videoTrack.setEnabled(true);
+//        localStream.addTrack(videoTrack);
+        videoCapturer.startCapture(1024, 640, 24);
+
+        *//*ScreenCapturerAndroid capturer = getScreenCapturer();
+        boolean screencast = capturer.isScreencast();
+        VideoSource videoSource = connectionFactory.createVideoSource(screencast);
+
+        SurfaceTextureHelper textureHelper = SurfaceTextureHelper.create("testthread", eglBase.getEglBaseContext());
+
+
+
+        capturer.initialize(textureHelper, App.getContext(), videoSource.getCapturerObserver());
+        capturer.startCapture(720, 1280, 0);*//*
+
+
+        AudioSource audioSource = connectionFactory.createAudioSource(new MediaConstraints());
+        AudioTrack audioTrack = connectionFactory.createAudioTrack("RTCaS0", audioSource);
+        this.audioTrack = audioTrack;
+        localStream.addTrack(audioTrack);
+
+        return localStream;
+    }*/
+
+    private ScreenCapturerAndroid getScreenCapturer() {
+        ScreenCapturerAndroid capturer = new ScreenCapturerAndroid(App.getCaptureIntent(), new MediaProjection.Callback() {
+            @Override
+            public void onStop() {
+                super.onStop();
+
+            }
+        });
+        return capturer;
     }
 
     private VideoCapturer createVideoCapturer() {

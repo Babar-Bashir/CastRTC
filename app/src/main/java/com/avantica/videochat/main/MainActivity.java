@@ -1,8 +1,10 @@
 package com.avantica.videochat.main;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,12 +14,13 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
 
+import com.avantica.videochat.App;
 import com.avantica.videochat.R;
 import com.avantica.videochat.call.CallActivity;
 import com.avantica.videochat.model.Call;
 
 
-public class MainActivity extends AppCompatActivity  implements UserListAdapter.ItemClickListener {
+public class MainActivity extends AppCompatActivity  implements UserListAdapter.ItemClickListener, ScreenCapturePermissionListener {
 
     private static final String CALL = "call";
 
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity  implements UserListAdapter.
         viewModel.onUserBusy.observe(this, isBusy -> {
             showUserBusy();
         });
+        //addScreenCapturePermissionFragment(savedInstanceState);
     }
 
     @Override
@@ -97,5 +101,27 @@ public class MainActivity extends AppCompatActivity  implements UserListAdapter.
         Intent callIntent = new Intent(getApplicationContext(), CallActivity.class);
         callIntent.putExtra(CALL, call);
         startActivity(callIntent);
+    }
+
+    private void addScreenCapturePermissionFragment(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            ScreenCapturePermissionFragment fragment = new ScreenCapturePermissionFragment();
+            transaction.add(fragment, "ScreenCapturePermissionDialog");
+            transaction.commit();
+        }
+    }
+
+    @Override
+    public void onScreenCapturePermissionResult(boolean hasPermission, @Nullable Intent data) {
+
+        if (!hasPermission)
+            throw new AssertionError("I ain't got no screen capture permission");
+
+        //ScreenCaptureHelper.RegisterScreenCapturer(getApplicationContext(), data, videoSource, eglBase);
+
+//        createOffer();
+//        createAnswer();
+        App.setCaptureIntent(data);
     }
 }

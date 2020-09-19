@@ -16,7 +16,7 @@ import com.avantica.videochat.rtc.RTCClientState;
 
 import org.webrtc.EglBase;
 import org.webrtc.SurfaceViewRenderer;
-import org.webrtc.VideoRenderer;
+
 import org.webrtc.VideoTrack;
 
 public class CallActivity extends AppCompatActivity {
@@ -57,7 +57,9 @@ public class CallActivity extends AppCompatActivity {
             EglBase rootEglBase = EglBase.create();
             videoView.init(rootEglBase.getEglBaseContext(), null);
 
-            videoTrack.addRenderer(new VideoRenderer(videoView));
+            //videoTrack.addRenderer(new VideoRenderer(videoView));
+            videoTrack.addSink(videoView);
+
         }));
 
         viewModel.remoteVideoTrack.observe(this, videoTrack -> CallActivity.this.runOnUiThread(() -> {
@@ -67,7 +69,8 @@ public class CallActivity extends AppCompatActivity {
             EglBase rootEglBase = EglBase.create();
             videoView.init(rootEglBase.getEglBaseContext(), null);
 
-            videoTrack.addRenderer(new VideoRenderer(videoView));
+            //videoTrack.addRenderer(new VideoRenderer(videoView));
+            videoTrack.addSink(videoView);
         }));
 
         viewModel.state.observe(this, state -> CallActivity.this.runOnUiThread(() -> {
