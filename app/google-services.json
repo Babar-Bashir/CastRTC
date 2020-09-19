@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "89489354652",
+    "firebase_url": "https://castrtc-22132.firebaseio.com",
+    "project_id": "castrtc-22132",
+    "storage_bucket": "castrtc-22132.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89489354652:android:b346881dce9d35bdc02259",
+        "android_client_info": {
+          "package_name": "com.avantica.videochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "89489354652-0lkacsss69qlmuo4mk6e0gvq9ra8k7ei.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFn_Gs-glgFEKdBAVwpjt9h_4uXU_lerc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "89489354652-0lkacsss69qlmuo4mk6e0gvq9ra8k7ei.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

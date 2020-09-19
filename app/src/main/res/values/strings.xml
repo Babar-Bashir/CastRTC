@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">VideoChat</string>
+    <string name="username">Username</string>
+    <string name="write_username">Write a username</string>
+    <string name="welcome">Welcome</string>
+    <string name="user_incoming_call"> wants to connect with you</string>
+    <string name="user_outging_call">Connecting with </string>
+    <string name="ok">OK</string>
+    <string name="sorry">Sorry</string>
+    <string name="busy_message">The user is unavailable at the moment.\nPlease try again later.</string>
+</resources>
